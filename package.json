@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple password manager project",
   "main": "password-manager.js",
+  "type": "module",
   "scripts": {
     "test": "mocha",
     "start": "node cli.js"
@@ -10,8 +11,10 @@
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
+    "crypto": "^1.0.1",
     "expect.js": "^0.3.1",
+    "lowdb": "^3.0.0",
     "mocha": "^9.1.4",
-    "crypto": "^1.0.1"
+    "readline": "^1.3.0"
   }
 }

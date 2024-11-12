@@ -1,13 +1,14 @@
-"use strict";
+// lib.js
 
-const { getRandomValues } = require('crypto');
+// Importing crypto library to generate random values
+import { randomBytes } from 'crypto';  // Using the ES module import syntax
 
 /**
  * Converts a plaintext string into a buffer for use in SubtleCrypto functions.
  * @param {string} str - A plaintext string
  * @returns {Buffer} A buffer representation for use in SubtleCrypto functions
  */
-function stringToBuffer(str) {
+export function stringToBuffer(str) {
     return Buffer.from(str);
 }
 
@@ -16,7 +17,7 @@ function stringToBuffer(str) {
  * @param {BufferSource} buf - A buffer containing string data
  * @returns {string} The original string
  */
-function bufferToString(buf) {
+export function bufferToString(buf) {
     return Buffer.from(buf).toString();
 }
 
@@ -26,7 +27,7 @@ function bufferToString(buf) {
  * @param {BufferSource} buf - A buffer-like object
  * @returns {string} A Base64 string representing the bytes in the buffer
  */
-function encodeBuffer(buf) {
+export function encodeBuffer(buf) {
     return Buffer.from(buf).toString('base64');
 }
 
@@ -35,7 +36,7 @@ function encodeBuffer(buf) {
  * @param {string} base64 - A Base64 string representing a buffer
  * @returns {Buffer} A Buffer object
  */
-function decodeBuffer(base64) {
+export function decodeBuffer(base64) {
     if (!base64) {
         throw new TypeError("Encoded string cannot be undefined or null.");
     }
@@ -47,14 +48,6 @@ function decodeBuffer(base64) {
  * @param {number} len - The number of random bytes
  * @returns {Uint8Array} A buffer of `len` random bytes
  */
-function getRandomBytes(len) {
-    return getRandomValues(new Uint8Array(len));
-}
-
-module.exports = {
-    stringToBuffer,
-    bufferToString,
-    encodeBuffer,
-    decodeBuffer,
-    getRandomBytes
+export function getRandomBytes(len) {
+    return randomBytes(len);
 }
