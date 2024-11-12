@@ -23,8 +23,10 @@ class PasswordManager {
             ["deriveBits", "deriveKey"]
         );
 
-        // Derive the master key using PBKDF2
-        const masterKey = await subtle.deriveKey(
+       
+
+        // Derive HMAC and AES keys from the master key
+        const hmacKey = await subtle.deriveKey(
             { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
             keyMaterial,
             { name: "HMAC", hash: "SHA-256", length: 256 },
@@ -32,19 +34,10 @@ class PasswordManager {
             ["sign", "verify"]
         );
 
-        // Derive HMAC and AES keys from the master key
-        const hmacKey = await subtle.importKey(
-            "raw",
-            await subtle.sign("HMAC", masterKey, stringToBuffer("HMAC key")),
-            { name: "HMAC", hash: "SHA-256" },
-            false,
-            ["sign"]
-        );
-
-        const aesKey = await subtle.importKey(
-            "raw",
-            await subtle.sign("HMAC", masterKey, stringToBuffer("AES key")),
-            { name: "AES-GCM" },
+        const aesKey = await subtle.deriveKey(
+            { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
             true,
             ["encrypt", "decrypt"]
         );
@@ -61,7 +54,7 @@ class PasswordManager {
 
         const salt = decodeBuffer(data.salt);
 
-        // Derive the master key using PBKDF2
+        // Import the password as key material for PBKDF2
         const keyMaterial = await subtle.importKey(
             "raw",
             stringToBuffer(password),
@@ -70,7 +63,8 @@ class PasswordManager {
             ["deriveBits", "deriveKey"]
         );
 
-        const derivedKey = await subtle.deriveKey(
+        // Derive the HMAC and AES keys from the master key
+        const hmacKey = await subtle.deriveKey(
             { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
             keyMaterial,
             { name: "HMAC", hash: "SHA-256", length: 256 },
@@ -78,27 +72,10 @@ class PasswordManager {
             ["sign", "verify"]
         );
 
-        // Verify integrity if trustedDataCheck is provided
-        if (trustedDataCheck !== undefined) {
-            const currentHash = await subtle.digest("SHA-256", stringToBuffer(representation));
-            if (bufferToString(currentHash) !== trustedDataCheck) {
-                throw new Error("Tampering detected!");
-            }
-        }
-
-        // Set up HMAC and AES keys
-        const hmacKey = await subtle.importKey(
-            "raw",
-            derivedKey,
-            { name: "HMAC", hash: "SHA-256" },
-            false,
-            ["sign"]
-        );
-
-        const aesKey = await subtle.importKey(
-            "raw",
-            derivedKey,
-            { name: "AES-GCM" },
+        const aesKey = await subtle.deriveKey(
+            { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
             true,
             ["encrypt", "decrypt"]
         );
